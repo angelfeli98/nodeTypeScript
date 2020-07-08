@@ -1,11 +1,12 @@
 import Server from "./appClass";
+import DataBase from './sql/databaseClass';
+
+const database = new DataBase();
 
 const port = 7070;
 
 const server = new Server(port);
 
-server.useServer();
-
 server.runServer(() => {
-    console.log(`Ready at http://localhost:${server.getPort()}`);
+    console.log(`Server ready at http://localhost:${server.getPort()}`);
 })
