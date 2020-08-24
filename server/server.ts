@@ -3,6 +3,7 @@ import express from 'express';
 import Api_user from './routes/user';
 import DataBase from './database/db';
 import cors from 'cors';
+import bodyparser, { json } from 'body-parser';
 
 export class Server{
 
@@ -14,7 +15,6 @@ export class Server{
         this.port = process.env.PORT;
         this.server = express();
         this.api_users = Api_user;
-
         this.configServer();
         this.initServer();
     }
@@ -23,6 +23,8 @@ export class Server{
         this.makeConnectionToDB();
 
         this.server.use(cors());
+        this.server.use(bodyparser.urlencoded({extended: false}));
+        this.server.use(bodyparser.json());
 
         this.server.use('/user', this.api_users);
     }

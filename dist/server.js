@@ -8,11 +8,14 @@ const express_1 = __importDefault(require("express"));
 const user_1 = __importDefault(require("./routes/user"));
 const db_1 = __importDefault(require("./database/db"));
 const cors_1 = __importDefault(require("cors"));
+const body_parser_1 = __importDefault(require("body-parser"));
 class Server {
     constructor() {
         this.configServer = () => {
             this.makeConnectionToDB();
             this.server.use(cors_1.default());
+            this.server.use(body_parser_1.default.urlencoded({ extended: false }));
+            this.server.use(body_parser_1.default.json());
             this.server.use('/user', this.api_users);
         };
         this.makeConnectionToDB = () => {
