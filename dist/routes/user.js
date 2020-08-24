@@ -24,6 +24,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const User = __importStar(require("../controllers/user"));
+const fields_validators_1 = require("../middlewares/fields-validators");
+const express_validator_1 = require("express-validator");
+const verifyToken_1 = require("../middlewares/verifyToken");
 const app = express_1.default.Router();
-app.get('/test', User.test);
+app.get('/getUsers', User.getUsers);
+app.get('/getUser/:id', verifyToken_1.verifyToken, User.getUserById);
+app.post('/saveUser', [
+    verifyToken_1.verifyToken,
+    express_validator_1.check('name', 'name must be porvided').not().isEmpty(),
+    express_validator_1.check('email', 'email must be porvided').not().isEmpty().isEmail(),
+    express_validator_1.check('password', 'password must be porvided').not().isEmpty(),
+    fields_validators_1.validateFields
+], User.saveUser);
+app.put('/updateUser/:id', verifyToken_1.verifyToken, User.updateUser);
+app.delete('/deleteUser/:id', verifyToken_1.verifyToken, User.deleteUser);
 exports.default = app;
