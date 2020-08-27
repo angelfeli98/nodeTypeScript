@@ -4,6 +4,7 @@ import DataBase from './database/db';
 import cors from 'cors';
 import bodyparser from 'body-parser';
 import fileupload from 'express-fileupload'
+import Path from 'path';
 
 import Api_user from './routes/user';
 import Api_auth from './routes/auth';
@@ -43,6 +44,7 @@ export class Server{
         this.server.use(bodyparser.urlencoded({extended: false}));
         this.server.use(bodyparser.json());
         this.server.use(fileupload());
+        this.server.use(express.static(Path.resolve(__dirname, 'public')));
 
         this.server.use('/user', this.api_users);
         this.server.use('/auth', this.api_auth);

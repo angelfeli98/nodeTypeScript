@@ -9,6 +9,7 @@ const db_1 = __importDefault(require("./database/db"));
 const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
+const path_1 = __importDefault(require("path"));
 const user_1 = __importDefault(require("./routes/user"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const hospital_1 = __importDefault(require("./routes/hospital"));
@@ -23,6 +24,7 @@ class Server {
             this.server.use(body_parser_1.default.urlencoded({ extended: false }));
             this.server.use(body_parser_1.default.json());
             this.server.use(express_fileupload_1.default());
+            this.server.use(express_1.default.static(path_1.default.resolve(__dirname, 'public')));
             this.server.use('/user', this.api_users);
             this.server.use('/auth', this.api_auth);
             this.server.use('/hospital', this.api_hospital);
