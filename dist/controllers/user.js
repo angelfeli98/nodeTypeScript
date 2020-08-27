@@ -38,12 +38,11 @@ const updateUser = async (req, res) => {
         const { password, google, ...fields } = req.body;
         const updatedUser = await user_1.default.findByIdAndUpdate(id, fields, { runValidators: true, new: true, context: 'query' });
         if (updatedUser)
-            res.status(200).json({ ok: true, message: 'User updated', updatedUser });
-        else
-            res.status(404).json({ ok: true, error: { message: 'not user' } });
+            return res.status(200).json({ ok: true, message: 'User updated', updatedUser });
+        return res.status(404).json({ ok: true, error: { message: 'not user' } });
     }
     catch (error) {
-        res.status(500).json({ ok: false, error });
+        return res.status(500).json({ ok: false, error });
     }
 };
 exports.updateUser = updateUser;
@@ -52,12 +51,11 @@ const deleteUser = async (req, res) => {
         const id = req.params.id;
         const deletedUser = await user_1.default.findByIdAndRemove(id);
         if (deletedUser)
-            res.status(200).json({ ok: true, deletedUser, message: 'User deleted' });
-        else
-            res.status(404).json({ ok: false, error: { message: 'Not user' } });
+            return res.status(200).json({ ok: true, deletedUser, message: 'User deleted' });
+        return res.status(404).json({ ok: false, error: { message: 'Not user' } });
     }
     catch (error) {
-        res.status(500).json({ ok: true, error });
+        return res.status(500).json({ ok: true, error });
     }
 };
 exports.deleteUser = deleteUser;
@@ -66,12 +64,11 @@ const getUserById = async (req, res) => {
         const id = req.params.id;
         const user = await user_1.default.findById(id);
         if (user)
-            res.status(200).json({ ok: true, user });
-        else
-            res.status(404).json({ ok: false, error: { message: 'not user' } });
+            return res.status(200).json({ ok: true, user });
+        return res.status(404).json({ ok: false, error: { message: 'not user' } });
     }
     catch (error) {
-        res.status(500).json({ ok: false, error });
+        return res.status(500).json({ ok: false, error });
     }
 };
 exports.getUserById = getUserById;

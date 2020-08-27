@@ -19,16 +19,21 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 const express_1 = require("express");
-const Hospital = __importStar(require("../controllers/hospital"));
 const verifyToken_1 = require("../middlewares/verifyToken");
-const fields_validators_1 = require("../middlewares/fields-validators");
+const Search = __importStar(require("../controllers/search"));
 const express_validator_1 = require("express-validator");
+const fields_validators_1 = require("../middlewares/fields-validators");
 const api = express_1.Router();
-api.get('/test', Hospital.test);
-api.get('/getHospitals', verifyToken_1.verifyToken, Hospital.getHospitals);
-api.post('/saveHospital', [
+api.get('/test/:field', verifyToken_1.verifyToken, Search.test);
+api.get('/inAll/:field', [
     verifyToken_1.verifyToken,
-    express_validator_1.check('name', 'name must be provided').notEmpty(),
+    express_validator_1.check('field', 'field must be provided').notEmpty(),
     fields_validators_1.validateFields
-], Hospital.saveHspital);
+], Search.searchInAll);
+api.get('/inCollection/:collection/:field', [
+    verifyToken_1.verifyToken,
+    express_validator_1.check('collection', 'collection must be provided').notEmpty(),
+    express_validator_1.check('field', 'field must be probided').notEmpty(),
+    fields_validators_1.validateFields
+], Search.searchByCollection);
 module.exports = api;

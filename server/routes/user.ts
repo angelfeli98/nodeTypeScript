@@ -13,9 +13,9 @@ app.get('/getUser/:id', verifyToken ,User.getUserById);
 
 app.post('/saveUser',[
     verifyToken,
-    check('name', 'name must be porvided').not().isEmpty(),
-    check('email', 'email must be porvided').not().isEmpty().isEmail(),
-    check('password', 'password must be porvided').not().isEmpty(),
+    check('name', 'name must be porvided').notEmpty(),
+    check('email', 'email must be porvided').not().notEmpty().isEmail(),
+    check('password', 'password must be porvided').notEmpty(),
     validateFields
 ], User.saveUser);
 

@@ -32,9 +32,9 @@ app.get('/getUsers', User.getUsers);
 app.get('/getUser/:id', verifyToken_1.verifyToken, User.getUserById);
 app.post('/saveUser', [
     verifyToken_1.verifyToken,
-    express_validator_1.check('name', 'name must be porvided').not().isEmpty(),
-    express_validator_1.check('email', 'email must be porvided').not().isEmpty().isEmail(),
-    express_validator_1.check('password', 'password must be porvided').not().isEmpty(),
+    express_validator_1.check('name', 'name must be porvided').notEmpty(),
+    express_validator_1.check('email', 'email must be porvided').not().notEmpty().isEmail(),
+    express_validator_1.check('password', 'password must be porvided').notEmpty(),
     fields_validators_1.validateFields
 ], User.saveUser);
 app.put('/updateUser/:id', verifyToken_1.verifyToken, User.updateUser);

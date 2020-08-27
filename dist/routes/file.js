@@ -19,16 +19,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 const express_1 = require("express");
-const Hospital = __importStar(require("../controllers/hospital"));
+const File = __importStar(require("../controllers/file"));
 const verifyToken_1 = require("../middlewares/verifyToken");
-const fields_validators_1 = require("../middlewares/fields-validators");
-const express_validator_1 = require("express-validator");
 const api = express_1.Router();
-api.get('/test', Hospital.test);
-api.get('/getHospitals', verifyToken_1.verifyToken, Hospital.getHospitals);
-api.post('/saveHospital', [
-    verifyToken_1.verifyToken,
-    express_validator_1.check('name', 'name must be provided').notEmpty(),
-    fields_validators_1.validateFields
-], Hospital.saveHspital);
+api.get('/test', File.test);
+api.post('/upload/:type/:id', verifyToken_1.verifyToken, File.uploadFile);
 module.exports = api;
