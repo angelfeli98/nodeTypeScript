@@ -22,14 +22,14 @@ const updateImg = async(req: Request, res: Response, pathImg: string): Promise<a
                 result = await Hospital.findByIdAndUpdate(id, data, opt);
             break;
             default:
-                return res.status(403).json({ok: true, error: {message: `${type} is not a valid type`}});
+                throw {message: `${type} is not a valid type`};
         }
     }catch(error){
-        return res.status(500).json({ok: false, error});
+        throw error;
     }
 
     if(!!!result)
-        return res.status(404).json({ok: false, error: {message: `${id} is not a vaild id for ${type}`}})
+        throw {message :`${id} is not a vaild id for ${type}`};
     return result;
 }
 

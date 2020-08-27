@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadFile = exports.test = void 0;
+exports.getImage = exports.uploadFile = exports.test = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const uuid_1 = require("uuid");
@@ -37,3 +37,11 @@ const uploadFile = async (req, res) => {
     }
 };
 exports.uploadFile = uploadFile;
+const getImage = async (req, res) => {
+    const { type, name } = req.params;
+    const path = path_1.default.resolve(__dirname, `../uploads/${type}/${name}`);
+    if (!!!fs_1.default.existsSync(path))
+        return res.status(200).sendFile(path_1.default.resolve(__dirname, '../uploads/no-img.jpg'));
+    return res.status(200).sendFile(path);
+};
+exports.getImage = getImage;

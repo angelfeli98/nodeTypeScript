@@ -37,13 +37,25 @@ const uploadFile = async(req: Request, res: Response): Promise<any> => {
 
         file.mv(path);
         res.status(200).json({ok: true, result, message: 'image uploaded'});
-    } catch(error){
+    }catch(error){
         res.status(500).json({ok: false, error})
     }
+}
+
+const getImage = async(req: Request, res: Response): Promise<any> => {
+    const {type, name} = req.params;
+
+    const path = Path.resolve(__dirname, `../uploads/${type}/${name}`);
+
+    if(!!!fs.existsSync(path))
+        return res.status(200).sendFile(Path.resolve(__dirname, '../uploads/no-img.jpg'));
+
+    return res.status(200).sendFile(path);
 
 }
 
 export{
     test,
-    uploadFile
+    uploadFile,
+    getImage
 }

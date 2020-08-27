@@ -7,6 +7,8 @@ const api = Router();
 
 api.get('/test', File.test)
 
+api.get('/load/:type/:name', verifyToken, File.getImage);
+
 api.post('/upload/:type/:id', verifyToken, File.uploadFile);
 
 export = api;
