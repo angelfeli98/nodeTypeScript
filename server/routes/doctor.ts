@@ -11,11 +11,15 @@ api.get('/test', Doctor.test);
 
 api.get('/getDoctors', verifyToken, Doctor.getDoctors);
 
-api.post('/saveDoctor', [
+api.post('/save', [
     verifyToken,
     check('hospital', 'hospital must be provided').notEmpty().isMongoId(),
     check('name', 'name must be provided').notEmpty(),
     validateFields
-], Doctor.saveDoctor)
+], Doctor.saveDoctor);
+
+api.put('/update/:id', verifyToken, Doctor.updateDoctor);
+
+api.delete('/delete/:id', verifyToken, Doctor.deleteDoctor);
 
 export = api;

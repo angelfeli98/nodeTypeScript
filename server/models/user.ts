@@ -38,17 +38,19 @@ const userSchema: mongoose.Schema = new mongoose.Schema({
         type: Boolean,
         default: false
     }
+},{
+    toJSON: {
+        transform: (doc, ret): any => {
+            const {_id, __v, password, ...object} = ret;
+            object.id = _id;
+            return object;
+        }
+    }
 })
 
 const options = {
     message: 'Error, {PATH} must be unique, bad value {VALUE}'
 }
-
-userSchema.method('toJSON', function(this: any){
-    const{__v, _id, password, ...object} = this.toObject();
-    object.id = _id;
-    return object;
-});
 
 userSchema.plugin(mongooseuniquevalidator, options);
 

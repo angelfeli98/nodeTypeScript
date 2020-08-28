@@ -22,17 +22,19 @@ const doctorSchema: Schema = new Schema({
         ref: 'User',
         required: [true, 'User must be provided']
     }
+},{
+    toJSON: {
+        transform: (doc, ret): any => {
+            const { __v, _id, ...object } = ret;
+            object.id = _id;
+            return object;
+        }
+    }
 })
 
 const options = {
     message: 'the value for {PATH} must be unique, {VALUE} bad value'
 }
-
-doctorSchema.method('toJSON', function(this: any){
-    const { __v, _id, ...object } = this.toObject();
-    object.id = _id;
-    return object;
-})
 
 doctorSchema.plugin(mongooseuniquevalidator, options)
 

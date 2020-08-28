@@ -1,6 +1,7 @@
 
 import { Request, Response } from 'express';
 import Doctor from '../models/doctor';
+import Hospital from '../models/hospital';
 
 const test = (req: Request, res: Response): void => {
     res.status(200).json({ok: true});
@@ -13,6 +14,7 @@ const saveDoctor = async(req: Request, res: Response): Promise<any> => {
 
         const newDoctor = new Doctor(object)
         const savedDoctor = await newDoctor.save();
+        await Hospital.findByIdAndUpdate(object.hospital, {'$push': {'doctors': savedDoctor._id}});
         res.status(200).json({ok: true, savedDoctor});
     }catch(error){
         res.status(500).json({ok: false, error});
@@ -39,8 +41,39 @@ const getDoctors = async(req: Request, res: Response): Promise<any> => {
     }
 }
 
+const deleteDoctor = async(req: Request, res: Response): Promise<any> => {
+    const id = req.params.id;
+    try {
+        const deletedDoctor = await Doctor.findByIdAndDelete(id);
+        if(!!!deletedDoctor)
+            return res.status(404).json({ok: false, error:{message: 'not doctor to delete'}});
+        const hospitalId = deletedDoctor.get('hospital');
+        await Hospital.findByIdAndUpdate(hospitalId, {'$pull': {'doctors': deletedDoctor._id}});
+        return res.status(200).json({ok: true, deletedDoctor});
+    }catch(error){
+        return res.status(500).json({ok: false, error})
+    }
+}
+
+const updateDoctor = async(req: Request, res: Response): Promise<any> => {
+    const id = req.params.id;
+    const data = req.body;
+    const options = {new: true, context: 'query', runValidators: true};
+    try {
+        const updatedDoctor = await Doctor.findByIdAndUpdate(id, data, options);
+        if(!!!updatedDoctor)
+            return res.status(404).json({ok: false, error:{message: 'not doctor to update'}});
+
+        return res.status(200).json({ok: true, updatedDoctor})
+    }catch(error){
+        return res.status(500).json({ok: true, error})
+    }
+}
+
 export{
     test,
     saveDoctor,
-    getDoctors
+    getDoctors,
+    deleteDoctor,
+    updateDoctor
 }

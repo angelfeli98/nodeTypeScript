@@ -24,14 +24,17 @@ const doctorSchema = new mongoose_1.Schema({
         ref: 'User',
         required: [true, 'User must be provided']
     }
+}, {
+    toJSON: {
+        transform: (doc, ret) => {
+            const { __v, _id, ...object } = ret;
+            object.id = _id;
+            return object;
+        }
+    }
 });
 const options = {
     message: 'the value for {PATH} must be unique, {VALUE} bad value'
 };
-doctorSchema.method('toJSON', function () {
-    const { __v, _id, ...object } = this.toObject();
-    object.id = _id;
-    return object;
-});
 doctorSchema.plugin(mongoose_unique_validator_1.default, options);
 module.exports = mongoose_1.model('Doctor', doctorSchema);

@@ -25,14 +25,17 @@ const hospitalSchema = new mongoose_1.Schema({
         ref: 'User',
         required: [true, 'user must be provided']
     }
+}, {
+    toJSON: {
+        transform: (doc, ret) => {
+            const { _id, __v, ...object } = ret;
+            object.id = _id;
+            return object;
+        }
+    }
 });
 const options = {
     massage: 'the value for {PATH} must be unique, {VALUE} bad value'
 };
-hospitalSchema.method('toJSON', function () {
-    const { __v, _id, ...object } = this.toObject();
-    object.id = _id;
-    return object;
-});
 hospitalSchema.plugin(mongoose_unique_validator_1.default, options);
 module.exports = mongoose_1.model('Hospital', hospitalSchema);

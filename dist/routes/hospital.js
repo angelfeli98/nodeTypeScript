@@ -26,9 +26,12 @@ const express_validator_1 = require("express-validator");
 const api = express_1.Router();
 api.get('/test', Hospital.test);
 api.get('/getHospitals', verifyToken_1.verifyToken, Hospital.getHospitals);
+api.get('/getById/:id', verifyToken_1.verifyToken, Hospital.getHospitalById);
 api.post('/saveHospital', [
     verifyToken_1.verifyToken,
     express_validator_1.check('name', 'name must be provided').notEmpty(),
     fields_validators_1.validateFields
 ], Hospital.saveHspital);
+api.put('/update/:id', verifyToken_1.verifyToken, Hospital.updateHospital);
+api.delete('/delete/:id', verifyToken_1.verifyToken, Hospital.deleteHospital);
 module.exports = api;

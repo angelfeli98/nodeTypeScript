@@ -26,10 +26,12 @@ const fields_validators_1 = require("../middlewares/fields-validators");
 const api = express_1.Router();
 api.get('/test', Doctor.test);
 api.get('/getDoctors', verifyToken_1.verifyToken, Doctor.getDoctors);
-api.post('/saveDoctor', [
+api.post('/save', [
     verifyToken_1.verifyToken,
     express_validator_1.check('hospital', 'hospital must be provided').notEmpty().isMongoId(),
     express_validator_1.check('name', 'name must be provided').notEmpty(),
     fields_validators_1.validateFields
 ], Doctor.saveDoctor);
+api.put('/update/:id', verifyToken_1.verifyToken, Doctor.updateDoctor);
+api.delete('/delete/:id', verifyToken_1.verifyToken, Doctor.deleteDoctor);
 module.exports = api;
