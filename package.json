@@ -8,7 +8,8 @@
     "loads": "copyfiles -u 1 -s true server/uploads/user dist",
     "html": "copyfiles -u 1 -s true server/public/*.html dist",
     "build": "copyfiles -u 1 -s true server/*.env docs",
-    "server": "nodemon dist/index.js && tsc --watch"
+    "server": "nodemon dist/index.js && tsc --watch",
+    "start": "run node dist/index.js"
   },
   "repository": {
     "type": "git",
