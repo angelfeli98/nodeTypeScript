@@ -24,7 +24,6 @@ class Server {
             this.server.use(body_parser_1.default.urlencoded({ extended: false }));
             this.server.use(body_parser_1.default.json());
             this.server.use(express_fileupload_1.default());
-            this.server.use(express_1.default.static(path_1.default.resolve(__dirname, 'public')));
             this.server.use('/user', this.api_users);
             this.server.use('/auth', this.api_auth);
             this.server.use('/hospital', this.api_hospital);

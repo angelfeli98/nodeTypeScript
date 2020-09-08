@@ -8,7 +8,7 @@ const user_1 = __importDefault(require("../models/user"));
 exports.verifyRole = async (req, res, next) => {
     const user = req.body.currentUser;
     const userInfo = await user_1.default.findById(user.id);
-    const role = userInfo?.get('role');
+    const role = userInfo.get('role');
     if (role !== 'ADMIN_ROLE')
         return res.status(403).json({ ok: false, error: { message: 'not auth' } });
     return next();
