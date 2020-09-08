@@ -11,6 +11,8 @@ api.get('/test', Doctor.test);
 
 api.get('/getDoctors', verifyToken, Doctor.getDoctors);
 
+api.get('/getById/:id', verifyToken, Doctor.getDoctorById);
+
 api.post('/save', [
     verifyToken,
     check('hospital', 'hospital must be provided').notEmpty().isMongoId(),

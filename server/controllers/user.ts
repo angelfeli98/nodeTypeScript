@@ -5,9 +5,15 @@ import { signToken } from '../helpers/jwt';
 import bycrypt from 'bcrypt';
 
 const getUsers = async(req: Request, res: Response):Promise<void> => {
+    const limit = +(req.query.limit || 5);
+    const skip = +(req.query.page || 1);
     try {
-        const users = await User.find({}, '-password');
-        res.status(200).json({ok: true, users})
+        const usersP = User.find({}, '-password')
+                                .limit(limit)
+                                .skip(limit * (skip - 1));
+        const resultsP = User.countDocuments();
+        const [users, results] = await Promise.all([usersP, resultsP]);
+        res.status(200).json({ok: true, users, results})
     }catch(error){
         res.status(401).json({ok:  false, error});
     }
@@ -18,10 +24,17 @@ const saveUser = async(req: Request, res: Response): Promise<any> => {
         const body = req.body;
         const salt = await bycrypt.genSalt();
         body.password = await bycrypt.hash(body.password, salt);
+        const prevUser = await User.findOne({email: req.body.email});
+        if(prevUser){
+            if(prevUser.get('google'))
+                return res.status(400).json({ok: false, error: {message: 'login with your google account please'}});
+            return res.status(400).json({ok: false, error: {message: 'user already exits'}});
+        }
+
         const newUser = new User(body);
         const savedUser = await newUser.save();
         const token = signToken(savedUser._id);
-        res.status(200).json({ ok: true, message: 'User saved', token})
+        return res.status(200).json({ ok: true, message: 'User saved', token})
     }catch(error){
         res.status(400).json({ ok: false, error })
     }
@@ -30,7 +43,9 @@ const saveUser = async(req: Request, res: Response): Promise<any> => {
 const updateUser = async(req: Request, res: Response): Promise<any> => {
     try {
         const id = req.params.id;
-        const { password, google, ...fields } = req.body;
+        const { password, email, google, ...fields } = req.body;
+        if(!!!google)
+            fields.email = email;
         const updatedUser = await User.findByIdAndUpdate(id, fields, { runValidators: true, new: true, context: 'query'});
         if(updatedUser)
             return res.status(200).json({ok: true, message: 'User updated', updatedUser});

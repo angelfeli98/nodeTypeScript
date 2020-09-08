@@ -15,9 +15,9 @@ exports.test = test;
 const searchInAll = async (req, res) => {
     const field = { name: new RegExp(req.params.field, 'i') };
     try {
-        const userPromise = user_1.default.find(field);
-        const doctorPromise = doctor_1.default.find(field);
-        const hospitalPromise = hospital_1.default.find(field);
+        const userPromise = user_1.default.find(field).populate('madeBy');
+        const doctorPromise = doctor_1.default.find(field).populate('madeBy').populate('hospital');
+        const hospitalPromise = hospital_1.default.find(field).populate('doctors').populate('madeBy');
         const [user, doctor, hospital] = await Promise.all([userPromise, doctorPromise, hospitalPromise]);
         res.status(200).json({ ok: true, result: { user, doctor, hospital } });
     }
@@ -27,25 +27,41 @@ const searchInAll = async (req, res) => {
 };
 exports.searchInAll = searchInAll;
 const searchByCollection = async (req, res) => {
+    const limit = +(req.query.limit || 5);
+    const page = +(req.query.page || 1);
     const field = { name: new RegExp(req.params.field, 'i') };
     const collection = req.params.collection;
-    let results = [];
+    let resultsP = null;
+    let NoResultsP = null;
     switch (collection) {
         case 'doctor':
-            results = await doctor_1.default.find(field).populate('madeBy', '_id name img');
+            resultsP = doctor_1.default.find(field)
+                .limit(limit)
+                .skip(limit * (page - 1))
+                .populate('madeBy')
+                .populate('hospital');
+            NoResultsP = doctor_1.default.countDocuments();
             break;
         case 'hospital':
-            results = await hospital_1.default.find(field).populate('madeBy', '_id name img');
+            resultsP = hospital_1.default.find(field)
+                .limit(limit)
+                .skip(limit * (page - 1))
+                .populate('madeBy', '_id name img');
+            NoResultsP = hospital_1.default.where('name').equals('user 10').countDocuments();
             break;
         case 'user':
-            results = await user_1.default.find(field);
+            resultsP = user_1.default.find(field)
+                .limit(limit)
+                .skip(limit * (page - 1));
+            NoResultsP = user_1.default.where('user').equals('user 10').countDocuments();
             break;
         default:
-            res.status(404).json({ ok: false, error: { message: `${collection} is not a valid collection` } });
+            return res.status(404).json({ ok: false, error: { message: `${collection} is not a valid collection` } });
             break;
     }
+    const [results, noResults] = await Promise.all([resultsP, NoResultsP]);
     if (results.length != 0)
-        res.status(200).json({ ok: true, results, collection });
+        res.status(200).json({ ok: true, results, collection, noResults });
     else
         res.status(404).json({ ok: true, error: { message: `not results` } });
 };

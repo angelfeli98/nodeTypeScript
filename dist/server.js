@@ -44,8 +44,8 @@ class Server {
         this.server = express_1.default();
         this.api_users = user_1.default;
         this.api_auth = auth_1.default;
-        this.api_hospital = hospital_1.default;
         this.api_doctor = doctor_1.default;
+        this.api_hospital = hospital_1.default;
         this.api_search = search_1.default;
         this.api_file = file_1.default;
         this.configServer();

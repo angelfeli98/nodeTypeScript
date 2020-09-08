@@ -26,6 +26,7 @@ const fields_validators_1 = require("../middlewares/fields-validators");
 const api = express_1.Router();
 api.get('/test', Doctor.test);
 api.get('/getDoctors', verifyToken_1.verifyToken, Doctor.getDoctors);
+api.get('/getById/:id', verifyToken_1.verifyToken, Doctor.getDoctorById);
 api.post('/save', [
     verifyToken_1.verifyToken,
     express_validator_1.check('hospital', 'hospital must be provided').notEmpty().isMongoId(),

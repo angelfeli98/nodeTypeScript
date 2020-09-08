@@ -23,6 +23,6 @@ const File = __importStar(require("../controllers/file"));
 const verifyToken_1 = require("../middlewares/verifyToken");
 const api = express_1.Router();
 api.get('/test', File.test);
-api.get('/load/:type/:name', verifyToken_1.verifyToken, File.getImage);
+api.get('/load/:type/:name', File.getImage);
 api.post('/upload/:type/:id', verifyToken_1.verifyToken, File.uploadFile);
 module.exports = api;

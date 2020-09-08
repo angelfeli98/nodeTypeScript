@@ -21,6 +21,20 @@ const saveDoctor = async(req: Request, res: Response): Promise<any> => {
     }
 }
 
+const getDoctorById = async(req: Request, res: Response): Promise<any> => {
+    const id = req.params.id;
+    try {
+        const doctor = await Doctor.findById(id)
+                                    .populate('madeBy')
+                                    .populate('hospital');
+        if(!!!doctor)
+            return res.status(404).json({ok: false, error:{message: 'Not doctor'}})
+        return res.status(200).json({ok: true, doctor});
+    } catch (error) {
+        return res.status(500).json({ok: false, error})
+    }
+}
+
 const getDoctors = async(req: Request, res: Response): Promise<any> => {
     try{
         const limit = +(Number(req.query.limit) || '10');
@@ -28,8 +42,8 @@ const getDoctors = async(req: Request, res: Response): Promise<any> => {
         const Doctors = Doctor.find()
                                     .limit(limit)
                                     .skip(limit*(page-1))
-                                    .populate('madeBy', 'name img _id')
-                                    .populate('hospital', 'name');
+                                    .populate('madeBy')
+                                    .populate('hospital');
         const Total = Doctor.countDocuments();
         const [ doctors , total] = await Promise.all([Doctors, Total]);
         if(doctors)
@@ -75,5 +89,6 @@ export{
     saveDoctor,
     getDoctors,
     deleteDoctor,
-    updateDoctor
+    updateDoctor,
+    getDoctorById
 }

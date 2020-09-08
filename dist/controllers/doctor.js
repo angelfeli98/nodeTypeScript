@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateDoctor = exports.deleteDoctor = exports.getDoctors = exports.saveDoctor = exports.test = void 0;
+exports.getDoctorById = exports.updateDoctor = exports.deleteDoctor = exports.getDoctors = exports.saveDoctor = exports.test = void 0;
 const doctor_1 = __importDefault(require("../models/doctor"));
 const hospital_1 = __importDefault(require("../models/hospital"));
 const test = (req, res) => {
@@ -24,6 +24,21 @@ const saveDoctor = async (req, res) => {
     }
 };
 exports.saveDoctor = saveDoctor;
+const getDoctorById = async (req, res) => {
+    const id = req.params.id;
+    try {
+        const doctor = await doctor_1.default.findById(id)
+            .populate('madeBy')
+            .populate('hospital');
+        if (!!!doctor)
+            return res.status(404).json({ ok: false, error: { message: 'Not doctor' } });
+        return res.status(200).json({ ok: true, doctor });
+    }
+    catch (error) {
+        return res.status(500).json({ ok: false, error });
+    }
+};
+exports.getDoctorById = getDoctorById;
 const getDoctors = async (req, res) => {
     try {
         const limit = +(Number(req.query.limit) || '10');
@@ -31,8 +46,8 @@ const getDoctors = async (req, res) => {
         const Doctors = doctor_1.default.find()
             .limit(limit)
             .skip(limit * (page - 1))
-            .populate('madeBy', 'name img _id')
-            .populate('hospital', 'name');
+            .populate('madeBy')
+            .populate('hospital');
         const Total = doctor_1.default.countDocuments();
         const [doctors, total] = await Promise.all([Doctors, Total]);
         if (doctors)

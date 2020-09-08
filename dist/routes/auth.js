@@ -23,11 +23,13 @@ const Auth = __importStar(require("../controllers/auth"));
 const express_validator_1 = require("express-validator");
 const fields_validators_1 = require("../middlewares/fields-validators");
 const verifyGoogleToken_1 = require("../middlewares/verifyGoogleToken");
+const verifyToken_1 = require("../middlewares/verifyToken");
 const app = express_1.Router();
 app.post('/login', [
     express_validator_1.check('password', 'password must be provided').not().isEmpty(),
     express_validator_1.check('email', 'email must be provided').not().isEmpty(),
     fields_validators_1.validateFields
 ], Auth.loginUser);
+app.post('/newToken', verifyToken_1.verifyToken, Auth.reEnvToken);
 app.post('/loginGoogle', verifyGoogleToken_1.verifyGoogleToken, Auth.loginByGoogle);
 module.exports = app;

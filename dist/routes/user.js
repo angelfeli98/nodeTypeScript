@@ -27,16 +27,17 @@ const User = __importStar(require("../controllers/user"));
 const fields_validators_1 = require("../middlewares/fields-validators");
 const express_validator_1 = require("express-validator");
 const verifyToken_1 = require("../middlewares/verifyToken");
+const verifyRole_1 = require("../middlewares/verifyRole");
+const verifySelf_1 = require("../middlewares/verifySelf");
 const app = express_1.default.Router();
-app.get('/getUsers', User.getUsers);
-app.get('/getUser/:id', verifyToken_1.verifyToken, User.getUserById);
+app.get('/getUsers', [verifyToken_1.verifyToken, verifyRole_1.verifyRole], User.getUsers);
+app.get('/getUser/:id', [verifyToken_1.verifyToken, verifyRole_1.verifyRole], User.getUserById);
 app.post('/saveUser', [
-    verifyToken_1.verifyToken,
     express_validator_1.check('name', 'name must be porvided').notEmpty(),
     express_validator_1.check('email', 'email must be porvided').not().notEmpty().isEmail(),
     express_validator_1.check('password', 'password must be porvided').notEmpty(),
     fields_validators_1.validateFields
 ], User.saveUser);
-app.put('/updateUser/:id', verifyToken_1.verifyToken, User.updateUser);
-app.delete('/deleteUser/:id', verifyToken_1.verifyToken, User.deleteUser);
+app.put('/updateUser/:id', [verifyToken_1.verifyToken, verifySelf_1.verifySelf], User.updateUser);
+app.delete('/deleteUser/:id', [verifyToken_1.verifyToken, verifyRole_1.verifyRole], User.deleteUser);
 exports.default = app;

@@ -12,9 +12,9 @@ const test = (req: Request, res: Response): void => {
 const searchInAll = async(req: Request, res: Response): Promise<void> => {
     const field = {name: new RegExp(req.params.field, 'i')};
     try {
-        const userPromise = User.find(field);
-        const doctorPromise = Doctor.find(field);
-        const hospitalPromise = Hospital.find(field);
+        const userPromise = User.find(field).populate('madeBy');
+        const doctorPromise = Doctor.find(field).populate('madeBy').populate('hospital');
+        const hospitalPromise = Hospital.find(field).populate('doctors').populate('madeBy');
         const [user, doctor, hospital] = await Promise.all([userPromise, doctorPromise, hospitalPromise]);
         res.status(200).json({ok: true, result: {user, doctor, hospital}});
     }catch(error){
@@ -22,26 +22,42 @@ const searchInAll = async(req: Request, res: Response): Promise<void> => {
     }
 }
 
-const searchByCollection = async(req: Request, res: Response): Promise<void> => {
+const searchByCollection = async(req: Request, res: Response): Promise<any> => {
+    const limit = +(req.query.limit || 5);
+    const page = +(req.query.page || 1);
     const field = {name: new RegExp(req.params.field, 'i')};
     const collection = req.params.collection;
-    let results: mongoose.Document[] = [];
+    let resultsP: mongoose.DocumentQuery<any, any> | null = null;
+    let NoResultsP: mongoose.Query<number> | null = null;
     switch (collection){
         case 'doctor':
-            results = await Doctor.find(field).populate('madeBy', '_id name img');
+            resultsP = Doctor.find(field)
+                                    .limit(limit)
+                                    .skip(limit * (page - 1))
+                                    .populate('madeBy')
+                                    .populate('hospital');
+            NoResultsP = Doctor.countDocuments();
         break;
         case 'hospital':
-            results = await Hospital.find(field).populate('madeBy', '_id name img');
+            resultsP = Hospital.find(field)
+                                    .limit(limit)
+                                    .skip(limit * (page - 1))
+                                    .populate('madeBy', '_id name img');
+            NoResultsP = Hospital.where('name').equals('user 10').countDocuments();
         break;
         case 'user':
-            results = await User.find(field);
+            resultsP = User.find(field)
+                                .limit(limit)
+                                .skip(limit * (page - 1));
+            NoResultsP = User.where('user').equals('user 10').countDocuments();
         break;
         default:
-            res.status(404).json({ok: false, error: {message: `${collection} is not a valid collection`}});
+            return res.status(404).json({ok: false, error: {message: `${collection} is not a valid collection`}});
         break;
     }
+    const [results, noResults] = await Promise.all([resultsP, NoResultsP]);
     if(results.length != 0)
-        res.status(200).json({ok: true, results, collection});
+        res.status(200).json({ok: true, results, collection, noResults});
     else
         res.status(404).json({ok: true, error: {message: `not results`}});
 

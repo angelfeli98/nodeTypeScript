@@ -28,8 +28,8 @@ export class Server{
         this.server = express();
         this.api_users = Api_user;
         this.api_auth = Api_auth;
-        this.api_hospital = Api_hospital;
         this.api_doctor = Api_doctor;
+        this.api_hospital = Api_hospital;
         this.api_search = Api_search;
         this.api_file = Api_File;
 

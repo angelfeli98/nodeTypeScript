@@ -8,9 +8,15 @@ const user_1 = __importDefault(require("../models/user"));
 const jwt_1 = require("../helpers/jwt");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const getUsers = async (req, res) => {
+    const limit = +(req.query.limit || 5);
+    const skip = +(req.query.page || 1);
     try {
-        const users = await user_1.default.find({}, '-password');
-        res.status(200).json({ ok: true, users });
+        const usersP = user_1.default.find({}, '-password')
+            .limit(limit)
+            .skip(limit * (skip - 1));
+        const resultsP = user_1.default.countDocuments();
+        const [users, results] = await Promise.all([usersP, resultsP]);
+        res.status(200).json({ ok: true, users, results });
     }
     catch (error) {
         res.status(401).json({ ok: false, error });
@@ -22,10 +28,16 @@ const saveUser = async (req, res) => {
         const body = req.body;
         const salt = await bcrypt_1.default.genSalt();
         body.password = await bcrypt_1.default.hash(body.password, salt);
+        const prevUser = await user_1.default.findOne({ email: req.body.email });
+        if (prevUser) {
+            if (prevUser.get('google'))
+                return res.status(400).json({ ok: false, error: { message: 'login with your google account please' } });
+            return res.status(400).json({ ok: false, error: { message: 'user already exits' } });
+        }
         const newUser = new user_1.default(body);
         const savedUser = await newUser.save();
         const token = jwt_1.signToken(savedUser._id);
-        res.status(200).json({ ok: true, message: 'User saved', token });
+        return res.status(200).json({ ok: true, message: 'User saved', token });
     }
     catch (error) {
         res.status(400).json({ ok: false, error });
@@ -35,7 +47,9 @@ exports.saveUser = saveUser;
 const updateUser = async (req, res) => {
     try {
         const id = req.params.id;
-        const { password, google, ...fields } = req.body;
+        const { password, email, google, ...fields } = req.body;
+        if (!!!google)
+            fields.email = email;
         const updatedUser = await user_1.default.findByIdAndUpdate(id, fields, { runValidators: true, new: true, context: 'query' });
         if (updatedUser)
             return res.status(200).json({ ok: true, message: 'User updated', updatedUser });
