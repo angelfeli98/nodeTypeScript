@@ -1,0 +1,18 @@
+
+FROM node:14
+
+RUN mkdir -p /home/feli/upiita/sistemas-distribuidos/01-docker/node_modules && chown -R node:node /home/feli/upiita/sistemas-distribuidos/01-docker
+
+WORKDIR /home/feli/upiita/sistemas-distribuidos/01-docker
+
+COPY package*.json ./
+
+USER node
+
+RUN npm install
+
+COPY --chown=node:node . .
+
+EXPOSE 7070
+
+CMD [ "node", "dist/index.js" ]
